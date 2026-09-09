@@ -9,12 +9,47 @@ mod physics;
 mod time;
 mod vec;
 
+use macroquad::camera::Camera;
 use macroquad::prelude::*;
 
 use bodies::Body;
 use physics::{Method, Sim};
 
 const MAX_TRAIL: usize = 3000;
+const STAR_COUNT: usize = 700;
+
+/// Fixed unit directions for the background stars — a celestial sphere that
+/// rides along with the camera, so it never shows parallax.
+struct Star {
+    dir: Vec3,
+    size: f32,
+    shade: Color,
+}
+
+fn make_stars() -> Vec<Star> {
+    (0..STAR_COUNT)
+        .map(|_| {
+            let z = rand::gen_range(-1.0_f32, 1.0);
+            let a = rand::gen_range(0.0_f32, std::f32::consts::TAU);
+            let r = (1.0 - z * z).sqrt();
+            let b = rand::gen_range(0.35_f32, 1.0);
+            // a faint blue / gold tint on some of them
+            let t = rand::gen_range(0.0_f32, 1.0);
+            let shade = if t < 0.15 {
+                Color::new(b * 0.8, b * 0.85, b, 1.0)
+            } else if t > 0.9 {
+                Color::new(b, b * 0.92, b * 0.8, 1.0)
+            } else {
+                Color::new(b, b, b, 1.0)
+            };
+            Star {
+                dir: vec3(r * a.cos(), z, r * a.sin()),
+                size: rand::gen_range(0.6_f32, 1.7),
+                shade,
+            }
+        })
+        .collect()
+}
 
 fn window_conf() -> Conf {
     Conf {
@@ -95,6 +130,8 @@ async fn main() {
         .map(|b| Color::new(b.color[0], b.color[1], b.color[2], 1.0))
         .collect();
 
+    let stars = make_stars();
+
     let mut sim = Sim::new(&bodies);
     let mut trails: Vec<Vec<Vec3>> = vec![Vec::new(); bodies.len()];
 
@@ -152,20 +189,45 @@ async fn main() {
         }
 
         // --- draw 3D ----------------------------------------------------
-        clear_background(Color::new(0.02, 0.03, 0.05, 1.0));
+        clear_background(Color::new(0.02, 0.02, 0.04, 1.0));
 
         let cp = pitch.cos();
-        set_camera(&Camera3D {
-            position: vec3(
-                dist * cp * yaw.cos(),
-                dist * pitch.sin(),
-                dist * cp * yaw.sin(),
-            ),
+        let eye = vec3(
+            dist * cp * yaw.cos(),
+            dist * pitch.sin(),
+            dist * cp * yaw.sin(),
+        );
+        let cam = Camera3D {
+            position: eye,
             up: vec3(0.0, 1.0, 0.0),
             target: vec3(0.0, 0.0, 0.0),
             fovy: 45.0_f32.to_radians(),
             ..Default::default()
-        });
+        };
+
+        // Background stars: project a camera-locked celestial sphere to 2D
+        // and draw it before the scene so the planets paint over it.
+        let vp = cam.matrix();
+        let (sw, sh) = (screen_width(), screen_height());
+        for s in &stars {
+            let clip = vp * (eye + s.dir * 40.0).extend(1.0);
+            if clip.w <= 0.0 {
+                continue;
+            }
+            let nx = clip.x / clip.w;
+            let ny = clip.y / clip.w;
+            if nx.abs() > 1.0 || ny.abs() > 1.0 {
+                continue;
+            }
+            draw_circle(
+                (nx * 0.5 + 0.5) * sw,
+                (1.0 - (ny * 0.5 + 0.5)) * sh,
+                s.size,
+                s.shade,
+            );
+        }
+
+        set_camera(&cam);
 
         if show_trails {
             for (i, trail) in trails.iter().enumerate() {
