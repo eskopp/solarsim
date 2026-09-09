@@ -33,10 +33,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          cp web/index.html web/mq_js_bundle.js dist/
+          cp web/mq_js_bundle.js dist/
           cp target/wasm32-unknown-unknown/release/solarsim.wasm dist/
           cp CNAME dist/
           touch dist/.nojekyll
+          # cache-bust the wasm so a redeploy is picked up without a hard reload
+          sed "s/solarsim\.wasm/solarsim.wasm?v=${GITHUB_SHA::7}/" web/index.html > dist/index.html
 
       - uses: actions/upload-pages-artifact@v5
         with:

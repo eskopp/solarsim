@@ -7,16 +7,10 @@
   <style>
     html, body { margin: 0; height: 100%; overflow: hidden; background: #05070d; }
     canvas { display: block; width: 100vw; height: 100vh; outline: none; }
-    #note {
-      position: fixed; left: 0; right: 0; bottom: 6px;
-      text-align: center; font: 12px system-ui, sans-serif; color: #6b7688;
-      pointer-events: none;
-    }
   </style>
 </head>
 <body>
   <canvas id="glcanvas" tabindex="0"></canvas>
-  <div id="note">drag to orbit &middot; wheel to zoom &middot; space pause &middot; 1/2/3 integrator &middot; [ ] step &middot; - = speed &middot; T trails &middot; R reset</div>
 
   <script src="mq_js_bundle.js"></script>
   <script>load("solarsim.wasm");</script>
