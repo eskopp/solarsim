@@ -5,7 +5,7 @@ real time and drawn with [macroquad](https://macroquad.rs). Written in Rust,
 compiled to WebAssembly, served from GitHub Pages — the same binary also runs
 natively on Linux, Windows and macOS.
 
-**Live:** https://eskopp.github.io/solarsim/
+**Live:** https://solarsim.erikskopp.de/
 
 ## Controls
 
