@@ -1,0 +1,20 @@
+[package]
+name = "solarsim"
+version = "0.1.0"
+edition = "2021"
+description = "N-body solar system, integrated live in the browser"
+license = "MIT"
+repository = "https://github.com/eskopp/solarsim"
+
+[[bin]]
+name = "solarsim"
+path = "src/main.rs"
+
+[dependencies]
+macroquad = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
