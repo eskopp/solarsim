@@ -29,6 +29,15 @@ impl Method {
             Method::Verlet => "Velocity Verlet",
         }
     }
+
+    /// Short label for a narrow button.
+    pub fn short(self) -> &'static str {
+        match self {
+            Method::Euler => "Euler",
+            Method::SymplecticEuler => "Sympl. Euler",
+            Method::Verlet => "Verlet",
+        }
+    }
 }
 
 pub struct Sim {

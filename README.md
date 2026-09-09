@@ -9,16 +9,9 @@ natively on Linux, Windows and macOS.
 
 ## Controls
 
-| | |
-|---|---|
-| drag | orbit camera |
-| wheel | zoom |
-| space | pause / resume |
-| `1` `2` `3` | Euler / Symplectic Euler / Velocity Verlet |
-| `[` `]` | halve / double the time step |
-| `-` `=` | fewer / more steps per frame |
-| `T` | toggle orbit trails |
-| `R` | reset to J2000 |
+Camera: drag (or one finger) to orbit, mouse wheel (or pinch) to zoom.
+Everything else is an on-screen button — pause, integrator, trails, speed,
+time step, reset — so it works on a phone with no keyboard.
 
 ## How it works
 
